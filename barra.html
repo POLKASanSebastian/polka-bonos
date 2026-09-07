@@ -50,6 +50,7 @@ main{max-width:560px;margin:0 auto;padding:18px 16px 0}
   font-weight:700;padding:12px 18px;border-radius:9px}
 .btn.grande{width:100%;padding:18px;font-size:1.1rem;font-family:var(--display);letter-spacing:.01em}
 .btn.fantasma{background:transparent;color:var(--klein);border-color:var(--linea-fuerte);font-weight:600}
+.btn.peligro{background:transparent;color:var(--alerta);border-color:var(--alerta);font-weight:600}
 .btn.pequeno{padding:8px 13px;font-size:.86rem;font-weight:600}
 .btn:disabled{opacity:.45;cursor:not-allowed}
 .fila{display:flex;gap:9px;flex-wrap:wrap}
@@ -123,6 +124,24 @@ main{max-width:560px;margin:0 auto;padding:18px 16px 0}
 #qr-nuevo{text-align:center;margin:14px 0 0;line-height:0}
 #qr-nuevo img,#qr-nuevo canvas{display:inline-block;width:150px;height:150px}
 .pie{margin-top:26px;font-size:.75rem;color:var(--gris);border-top:1px solid var(--linea);padding-top:13px}
+
+/* --- equipo --- */
+.pill.jefe{color:var(--klein)}
+.nav-jefe{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}
+.nav-jefe .btn{flex:1;min-width:140px}
+.persona{background:var(--superficie);border:1px solid var(--linea);border-radius:10px;
+  padding:13px 15px;margin-bottom:9px;box-shadow:var(--sombra)}
+.persona .nom{font-weight:700;font-size:.98rem}
+.persona .cod{font-family:var(--display);font-weight:800;letter-spacing:.14em;
+  font-variant-numeric:tabular-nums;color:var(--gris);font-size:.86rem;margin-left:8px}
+.persona .acc{display:flex;gap:8px;flex-wrap:wrap;margin-top:11px}
+.persona.baja{background:var(--crema);opacity:.85}
+.persona.baja .nom{text-decoration:line-through;color:var(--gris)}
+.campo .ayuda{font-size:.74rem;color:var(--gris);font-weight:400;text-transform:none;letter-spacing:0}
+.reg{background:var(--superficie);border:1px solid var(--linea);border-radius:9px;
+  padding:11px 14px;margin-bottom:8px;font-size:.85rem}
+.reg .l1{font-weight:700}
+.reg .l2{color:var(--gris);font-size:.76rem;font-variant-numeric:tabular-nums;margin-top:3px}
 </style>
 </head>
 <body>
@@ -150,23 +169,31 @@ var API = 'https://polka-bonos-api.inversportinver.workers.dev/';
 
   var app = document.getElementById('app');
   var cajaUsuario = document.getElementById('usuario');
-  var sesion = { pin: '', nombre: '' };
+  var sesion = { pin: '', nombre: '', rol: 'equipo' };
+
+  function esJefe() { return sesion.rol === 'responsable'; }
 
   function guardaSesion() {
     try {
       localStorage.setItem('polka-bonos-pin', sesion.pin);
       localStorage.setItem('polka-bonos-nombre', sesion.nombre);
+      localStorage.setItem('polka-bonos-rol', sesion.rol);
     } catch (e) {}
   }
   function cargaSesion() {
     try {
       sesion.pin = localStorage.getItem('polka-bonos-pin') || '';
       sesion.nombre = localStorage.getItem('polka-bonos-nombre') || '';
+      sesion.rol = localStorage.getItem('polka-bonos-rol') || 'equipo';
     } catch (e) {}
   }
   function salir() {
-    sesion = { pin: '', nombre: '' };
-    try { localStorage.removeItem('polka-bonos-pin'); localStorage.removeItem('polka-bonos-nombre'); } catch (e) {}
+    sesion = { pin: '', nombre: '', rol: 'equipo' };
+    try {
+      localStorage.removeItem('polka-bonos-pin');
+      localStorage.removeItem('polka-bonos-nombre');
+      localStorage.removeItem('polka-bonos-rol');
+    } catch (e) {}
     arranca();
   }
 
@@ -230,7 +257,8 @@ var API = 'https://polka-bonos-api.inversportinver.workers.dev/';
 
   function pintaCabecera() {
     if (!sesion.nombre) { cajaUsuario.innerHTML = ''; return; }
-    cajaUsuario.innerHTML = 'Sirve<b>' + esc(sesion.nombre) + '</b>' +
+    cajaUsuario.innerHTML = (esJefe() ? 'Responsable' : 'Sirve') +
+      '<b>' + esc(sesion.nombre) + '</b>' +
       '<button type="button" id="btn-salir">Cambiar</button>';
     document.getElementById('btn-salir').addEventListener('click', salir);
   }
@@ -257,6 +285,7 @@ var API = 'https://polka-bonos-api.inversportinver.workers.dev/';
       jsonp({ action: 'login', pin: v }, function (r) {
         if (!r || !r.ok) return pantallaAcceso((r && r.error) || 'No se ha podido comprobar el código');
         sesion.pin = v; sesion.nombre = r.nombre;
+        sesion.rol = r.rol === 'responsable' ? 'responsable' : 'equipo';
         guardaSesion(); pintaCabecera(); arranca();
       });
     }
@@ -381,11 +410,23 @@ var API = 'https://polka-bonos-api.inversportinver.workers.dev/';
             '<span class="cnt">' + b.restantes + '</span></button>';
         });
       }
+      if (esJefe()) {
+        html += '<div class="seccion"><h2>Responsable</h2></div>' +
+          '<div class="nav-jefe">' +
+            '<button class="btn fantasma pequeno" id="ir-equipo">Equipo y códigos</button>' +
+            '<button class="btn fantasma pequeno" id="ir-anuladas">Comidas anuladas</button>' +
+          '</div>';
+      }
+
       html += '<p class="pie">Menú Polkero 18,95 € · L-V 12:30-16:00 · festivos no · ' +
               'suplementos y 10 % de terraza fuera del bono.</p>';
       app.innerHTML = html;
 
       document.getElementById('btn-nuevo').addEventListener('click', pantallaNuevo);
+      var ie = document.getElementById('ir-equipo');
+      if (ie) ie.addEventListener('click', function () { pantallaEquipo(); });
+      var ia = document.getElementById('ir-anuladas');
+      if (ia) ia.addEventListener('click', pantallaAnuladas);
       Array.prototype.forEach.call(app.querySelectorAll('.item'), function (el) {
         el.addEventListener('click', function () { irA(el.getAttribute('data-t')); });
       });
@@ -533,6 +574,219 @@ var API = 'https://polka-bonos-api.inversportinver.workers.dev/';
         colorDark: '#14162B', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M
       });
     } catch (e) {}
+  }
+
+  /* ---------- pantalla: equipo (solo responsables) ---------- */
+  function pantallaEquipo(extra) {
+    app.innerHTML = (extra || '') + '<p class="cargando">Cargando el equipo…</p>';
+    jsonp({ action: 'equipo', pin: sesion.pin }, function (r) {
+      if (!r || !r.ok) {
+        app.innerHTML = (extra || '') +
+          '<div class="caja-error">' + esc((r && r.error) || 'No se ha podido cargar el equipo') + '</div>' +
+          '<button class="btn fantasma" id="volver">Volver</button>';
+        document.getElementById('volver').addEventListener('click', function () { irA(''); });
+        return;
+      }
+      var gente = r.equipo || [];
+      var altas = 0;
+      gente.forEach(function (p) { if (String(p.activo).toUpperCase() !== 'NO') altas++; });
+
+      var html = (extra || '') +
+        '<div class="pista"><b>El código es la firma de cada uno.</b> Cada comida descontada, ' +
+        'deshecha o anulada queda con el nombre de quien la hizo. Por eso nadie usa el código de otro, ' +
+        'y por eso al que se va se le da de baja el mismo día.</div>' +
+        '<button class="btn grande" id="btn-alta">+ Dar de alta a alguien</button>' +
+        '<div class="seccion"><h2>' + altas + ' en activo</h2></div>';
+
+      gente.forEach(function (p) {
+        var baja = String(p.activo).toUpperCase() === 'NO';
+        var jefe = p.rol === 'responsable';
+        var yo = String(p.codigo) === String(sesion.pin);
+        html += '<div class="persona' + (baja ? ' baja' : '') + '">' +
+          '<div><span class="nom">' + esc(p.nombre) + '</span>' +
+          '<span class="cod">' + esc(p.codigo) + '</span></div>' +
+          '<div class="etiquetas">' +
+            (jefe ? '<span class="pill jefe">Responsable</span>' : '<span class="pill neutro">Equipo</span>') +
+            (yo ? '<span class="pill ok">Eres tú</span>' : '') +
+            (baja ? '<span class="pill alerta">De baja</span>' : '') +
+          '</div>' +
+          '<div class="acc">' +
+            '<button class="btn fantasma pequeno" data-editar="' + esc(p.codigo) + '">' +
+              (baja ? 'Reactivar' : 'Cambiar') + '</button>' +
+            (baja || yo ? '' :
+              '<button class="btn peligro pequeno" data-baja="' + esc(p.codigo) +
+              '" data-nom="' + esc(p.nombre) + '">Dar de baja</button>') +
+          '</div>' +
+        '</div>';
+      });
+
+      html += '<button class="btn fantasma" style="margin-top:14px" id="volver">Volver a los bonos</button>' +
+        '<p class="pie">Dar de baja no borra nada: lo que esa persona hizo sigue en el registro con su nombre. ' +
+        'Solo deja de poder entrar.</p>';
+      app.innerHTML = html;
+
+      document.getElementById('btn-alta').addEventListener('click', function () { formEquipo(null); });
+      document.getElementById('volver').addEventListener('click', function () { irA(''); });
+
+      Array.prototype.forEach.call(app.querySelectorAll('[data-editar]'), function (el) {
+        el.addEventListener('click', function () {
+          var c = el.getAttribute('data-editar');
+          var p = null;
+          gente.forEach(function (x) { if (String(x.codigo) === c) p = x; });
+          formEquipo(p);
+        });
+      });
+      Array.prototype.forEach.call(app.querySelectorAll('[data-baja]'), function (el) {
+        el.addEventListener('click', function () {
+          confirmaBaja(el.getAttribute('data-baja'), el.getAttribute('data-nom'));
+        });
+      });
+    });
+  }
+
+  function confirmaBaja(codigo, nombre) {
+    app.innerHTML =
+      '<div class="caja-aviso"><h2>¿Dar de baja a ' + esc(nombre) + '?</h2>' +
+        '<p>Su código dejará de funcionar ahora mismo. Lo que ya hizo se queda en el registro. ' +
+        'Si vuelve, se le puede reactivar.</p>' +
+        '<div class="fila">' +
+          '<button class="btn peligro pequeno" id="si">Sí, darle de baja</button>' +
+          '<button class="btn fantasma pequeno" id="no">Dejarlo</button>' +
+        '</div>' +
+      '</div>';
+    document.getElementById('no').addEventListener('click', function () { pantallaEquipo(); });
+    document.getElementById('si').addEventListener('click', function () {
+      var b = document.getElementById('si');
+      b.disabled = true; b.textContent = 'Un momento…';
+      jsonp({ action: 'equipo', pin: sesion.pin, codigo: codigo, baja: '1' }, function (r) {
+        if (!r || !r.ok) {
+          return pantallaEquipo('<div class="caja-error">' + esc((r && r.error) || 'No se ha podido') + '</div>');
+        }
+        pantallaEquipo('<div class="caja-ok"><h2>' + esc(nombre) + ' ya no puede entrar</h2></div>');
+      });
+    });
+  }
+
+  /* base = null para alta, o el registro de la persona para cambiarlo */
+  function formEquipo(base) {
+    var alta = !base;
+    var yo = !alta && String(base.codigo) === String(sesion.pin);
+    var jefe = !alta && base.rol === 'responsable';
+    var baja = !alta && String(base.activo).toUpperCase() === 'NO';
+
+    app.innerHTML =
+      '<div class="tarjeta">' +
+        '<h2>' + (alta ? 'Dar de alta' : (baja ? 'Reactivar a ' + esc(base.nombre) : esc(base.nombre))) + '</h2>' +
+        '<p class="meta">' + (alta
+          ? 'Elige tú el código y díselo en persona. No lo mandes por WhatsApp del grupo.'
+          : 'El código no se puede cambiar. Si quieres darle otro, dale de baja este y créale uno nuevo.') +
+        '</p>' +
+        '<div class="campo" style="margin-top:16px"><label for="e-nombre">Nombre</label>' +
+          '<input id="e-nombre" autocomplete="off" placeholder="Como le llamáis en barra" value="' +
+          (alta ? '' : esc(base.nombre)) + '"></div>' +
+        '<div class="campo"><label for="e-codigo">Código</label>' +
+          '<input id="e-codigo" type="tel" inputmode="numeric" maxlength="8" autocomplete="off" ' +
+          'placeholder="4 a 8 números" value="' + (alta ? '' : esc(base.codigo)) + '"' +
+          (alta ? '' : ' readonly') + '>' +
+          (alta ? '<span class="ayuda">De 4 a 8 números, sin empezar por cero. Que no sea 1234 ni su fecha de nacimiento.</span>' : '') +
+        '</div>' +
+        '<div class="campo"><label for="e-rol">Nivel</label>' +
+          '<select id="e-rol"' + (yo ? ' disabled' : '') + '>' +
+            '<option value="equipo"' + (!jefe ? ' selected' : '') + '>Equipo — descuenta comidas y crea bonos</option>' +
+            '<option value="responsable"' + (jefe ? ' selected' : '') + '>Responsable — además gestiona el equipo</option>' +
+          '</select>' +
+          '<span class="ayuda">' + (yo
+            ? 'No puedes quitarte a ti mismo el nivel de responsable. Que te lo cambie otro responsable.'
+            : 'Un responsable puede dar de alta y de baja gente, anular comidas viejas y borrar bonos.') +
+          '</span>' +
+        '</div>' +
+        '<div class="fila">' +
+          '<button class="btn" id="e-guardar" style="flex:1">' +
+            (alta ? 'Dar de alta' : (baja ? 'Reactivar' : 'Guardar')) + '</button>' +
+          '<button class="btn fantasma" id="e-cancelar">Cancelar</button>' +
+        '</div>' +
+      '</div>';
+
+    document.getElementById('e-cancelar').addEventListener('click', function () { pantallaEquipo(); });
+    document.getElementById('e-guardar').addEventListener('click', function () {
+      var nombre = document.getElementById('e-nombre').value.trim();
+      var codigo = document.getElementById('e-codigo').value.trim();
+      var rol = yo ? 'responsable' : document.getElementById('e-rol').value;
+
+      if (!nombre) return document.getElementById('e-nombre').focus();
+      if (!/^[0-9]{4,8}$/.test(codigo)) {
+        return formError('El código son de 4 a 8 números, nada más.');
+      }
+      if (codigo.charAt(0) === '0') {
+        return formError('El código no puede empezar por cero.');
+      }
+
+      var btn = document.getElementById('e-guardar');
+      btn.disabled = true; btn.textContent = 'Guardando…';
+      jsonp({ action: 'equipo', pin: sesion.pin, codigo: codigo, nombre: nombre, rol: rol }, function (r) {
+        if (!r || !r.ok) {
+          btn.disabled = false; btn.textContent = alta ? 'Dar de alta' : 'Guardar';
+          return formError((r && r.error) || 'No se ha podido guardar');
+        }
+        if (codigo === String(sesion.pin)) {
+          sesion.nombre = nombre; guardaSesion(); pintaCabecera();
+        }
+        pantallaEquipo('<div class="caja-ok"><h2>' + esc(nombre) +
+          (alta ? ' ya puede entrar' : ' actualizado') + '</h2>' +
+          (alta ? '<p>Su código es <b>' + esc(codigo) + '</b>. Díselo en persona.</p>' : '') +
+          '</div>');
+      });
+    });
+  }
+
+  function formError(msg) {
+    var viejo = app.querySelector('.caja-error');
+    if (viejo) viejo.parentNode.removeChild(viejo);
+    app.insertBefore(crearError(msg), app.firstChild);
+    window.scrollTo(0, 0);
+  }
+
+  /* ---------- pantalla: comidas anuladas (solo responsables) ---------- */
+  function pantallaAnuladas() {
+    app.innerHTML = '<p class="cargando">Cargando el registro…</p>';
+    jsonp({ action: 'anuladas', pin: sesion.pin }, function (r) {
+      if (!r || !r.ok) {
+        app.innerHTML = '<div class="caja-error">' + esc((r && r.error) || 'No se ha podido cargar') + '</div>' +
+          '<button class="btn fantasma" id="volver">Volver</button>';
+        document.getElementById('volver').addEventListener('click', function () { irA(''); });
+        return;
+      }
+      var lista = r.anuladas || [];
+      var html = '<div class="pista"><b>Comidas que se descontaron y luego se deshicieron.</b> ' +
+        'Aquí no hay nada malo por sistema: casi siempre es un error de barra corregido al momento. ' +
+        'Mira las que se deshicieron mucho después, o las que se repiten con la misma persona.</div>' +
+        '<div class="seccion"><h2>' + lista.length + (lista.length === 200 ? '+' : '') + ' anuladas</h2></div>';
+
+      if (!lista.length) {
+        html += '<div class="tarjeta"><h2>Ninguna, de momento</h2>' +
+                '<p class="meta">No se ha deshecho ninguna comida.</p></div>';
+      } else {
+        lista.forEach(function (c) {
+          html += '<div class="reg">' +
+            '<div class="l1">' + esc(c.nombre || 'Bono') +
+              (c.tipo === 'cortesia' ? ' · cortesía' : '') + '</div>' +
+            '<div class="l2">Descontada ' + fechaHora(c.fecha) + ' por ' + esc(c.quien || '—') + '</div>' +
+            '<div class="l2">Deshecha ' + fechaHora(c.anuladoEn) + ' por ' + esc(c.anuladoPor || '—') + '</div>' +
+          '</div>';
+        });
+      }
+      html += '<button class="btn fantasma" style="margin-top:14px" id="volver">Volver a los bonos</button>';
+      app.innerHTML = html;
+      document.getElementById('volver').addEventListener('click', function () { irA(''); });
+    });
+  }
+
+  function fechaHora(iso) {
+    if (!iso) return '—';
+    var d = new Date(iso);
+    if (isNaN(d)) return '—';
+    return d.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' }) + ' a las ' +
+           d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
   }
 
   function irA(t) {
