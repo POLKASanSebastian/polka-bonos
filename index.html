@@ -110,11 +110,8 @@ main{max-width:460px;margin:0 auto;padding:0 16px}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
-/* ================================================================= *
- *  URL de la aplicación web de Apps Script (termina en /exec)
- * ================================================================= */
-var API = 'https://script.google.com/macros/s/AKfycbz9Ly4vRbFrTndHOg9xatZB5K7-BRm2Sl5fdyaTNyiaA48KlqY-0gHJPEuyDv1oZrrrTg/exec';
-/* ================================================================= */
+/* Motor de bonos en Cloudflare Workers */
+var API = 'https://polka-bonos-api.inversportinver.workers.dev/';
 
 (function () {
   var app = document.getElementById('app');
