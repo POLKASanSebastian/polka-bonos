@@ -1,0 +1,562 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Barra · Bonos POLKA</title>
+<meta name="theme-color" content="#002FA7">
+<meta name="robots" content="noindex, nofollow">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Bonos barra">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Karla:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --papel:#FBF9F5; --crema:#F1ECE0; --superficie:#FFFFFF;
+  --linea:#DFD8C8; --linea-fuerte:#C9C0AC;
+  --tinta:#14162B; --gris:#63678A;
+  --klein:#002FA7; --btn-bg:#002FA7; --btn-fg:#FFFFFF;
+  --oro:#A8791C; --ok:#1B6B4F; --ok-fondo:#E6F2EC;
+  --aviso:#8F5410; --aviso-fondo:#FBF0DF; --alerta:#9C1F32;
+  --sombra:0 1px 2px rgba(20,22,43,.06), 0 8px 24px -16px rgba(20,22,43,.25);
+  --display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --texto:"Karla","Helvetica Neue",Arial,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--papel);color:var(--tinta);font-family:var(--texto);
+  font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased;padding-bottom:60px}
+h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance}
+button{font-family:var(--texto);font-size:1rem;cursor:pointer}
+input,select{font-family:var(--texto);font-size:1rem}
+:focus-visible{outline:3px solid var(--klein);outline-offset:2px;border-radius:4px}
+
+.topbar{background:var(--btn-bg);color:#fff;
+  padding:calc(14px + env(safe-area-inset-top)) 18px 16px;
+  display:flex;align-items:flex-end;justify-content:space-between;gap:14px}
+.marca{font-family:var(--display);font-weight:800;font-size:1.35rem;letter-spacing:.14em;line-height:1}
+.marca span{display:block;font-family:var(--texto);font-weight:600;font-size:.66rem;
+  letter-spacing:.16em;text-transform:uppercase;opacity:.78;margin-top:5px}
+.usuario{font-size:.72rem;text-align:right;opacity:.9}
+.usuario b{display:block;font-size:.85rem;font-weight:700}
+.usuario button{background:transparent;border:0;color:#fff;opacity:.75;
+  text-decoration:underline;font-size:.7rem;padding:2px 0}
+
+main{max-width:560px;margin:0 auto;padding:18px 16px 0}
+
+.btn{border:1px solid var(--btn-bg);background:var(--btn-bg);color:var(--btn-fg);
+  font-weight:700;padding:12px 18px;border-radius:9px}
+.btn.grande{width:100%;padding:18px;font-size:1.1rem;font-family:var(--display);letter-spacing:.01em}
+.btn.fantasma{background:transparent;color:var(--klein);border-color:var(--linea-fuerte);font-weight:600}
+.btn.peligro{background:transparent;color:var(--alerta);border-color:var(--alerta);font-weight:600}
+.btn.pequeno{padding:8px 13px;font-size:.86rem;font-weight:600}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.fila{display:flex;gap:9px;flex-wrap:wrap}
+
+.tarjeta{background:var(--superficie);border:1px solid var(--linea);border-radius:12px;
+  box-shadow:var(--sombra);padding:18px;margin-bottom:14px}
+.tarjeta h2{font-size:1.15rem;font-weight:700}
+.meta{font-size:.78rem;color:var(--gris);margin:5px 0 0;font-variant-numeric:tabular-nums}
+
+.cabecera-bono{display:flex;justify-content:space-between;gap:14px;align-items:flex-start}
+.restantes{text-align:right;flex:none}
+.restantes .n{font-family:var(--display);font-weight:800;font-size:3rem;line-height:.85;
+  letter-spacing:-.035em;color:var(--klein);display:block;font-variant-numeric:tabular-nums}
+.restantes .u{font-size:.62rem;text-transform:uppercase;letter-spacing:.11em;color:var(--gris);font-weight:600}
+
+.casillas{display:flex;flex-wrap:wrap;gap:5px;margin-top:14px}
+.cas{width:26px;height:26px;border-radius:4px;border:1.5px solid var(--linea-fuerte);
+  display:grid;place-items:center;flex:none}
+.cas.regalo{border-style:dashed;border-color:var(--oro)}
+.cas.primera-regalo{margin-left:10px}
+.cas.usada{background:var(--btn-bg);border-color:var(--btn-bg)}
+.cas.usada.regalo{background:var(--oro);border-color:var(--oro);border-style:solid}
+.cas svg{width:14px;height:14px;display:block}
+.leyenda{font-size:.72rem;color:var(--gris);margin-top:9px}
+.leyenda b{color:var(--oro)}
+
+.etiquetas{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.pill{font-size:.68rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  padding:4px 9px;border-radius:999px;border:1px solid currentColor}
+.pill.ok{color:var(--ok)} .pill.aviso{color:var(--aviso)}
+.pill.alerta{color:var(--alerta)} .pill.neutro{color:var(--gris)}
+
+.caja-ok{background:var(--ok-fondo);border:1px solid var(--ok);border-radius:11px;
+  padding:16px 18px;margin-bottom:14px}
+.caja-ok h2{color:var(--ok);font-size:1.05rem}
+.caja-ok p{margin:6px 0 0;font-size:.9rem;color:var(--tinta)}
+.caja-aviso{background:var(--aviso-fondo);border:1px solid var(--aviso);border-radius:11px;
+  padding:16px 18px;margin-bottom:14px}
+.caja-aviso h2{color:var(--aviso);font-size:1rem}
+.caja-aviso p{margin:6px 0 12px;font-size:.9rem}
+.caja-error{background:var(--superficie);border:1px solid var(--alerta);border-left-width:4px;
+  border-radius:9px;padding:14px 16px;margin-bottom:14px;color:var(--alerta);font-size:.92rem;font-weight:600}
+
+.campo{display:flex;flex-direction:column;gap:5px;margin-bottom:13px}
+.campo label{font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;font-weight:700;color:var(--gris)}
+.campo input,.campo select{padding:12px;border-radius:8px;border:1px solid var(--linea-fuerte);
+  background:var(--superficie);color:var(--tinta);width:100%}
+.dos{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.resumen-precio{background:#E4E9FB;border-radius:8px;padding:11px 13px;font-size:.85rem;
+  display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:15px}
+.resumen-precio b{font-family:var(--display);font-weight:800;color:var(--klein);font-variant-numeric:tabular-nums}
+
+.seccion{margin:22px 0 10px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.seccion h2{font-size:.72rem;text-transform:uppercase;letter-spacing:.12em;color:var(--gris);font-weight:700}
+
+.item{background:var(--superficie);border:1px solid var(--linea);border-radius:10px;
+  padding:13px 15px;display:flex;align-items:center;gap:14px;margin-bottom:9px;
+  width:100%;text-align:left;box-shadow:var(--sombra)}
+.item .nom{font-weight:700;font-size:.98rem}
+.item .sub{font-size:.74rem;color:var(--gris);font-variant-numeric:tabular-nums}
+.item .cnt{margin-left:auto;font-family:var(--display);font-weight:800;font-size:1.5rem;
+  color:var(--klein);font-variant-numeric:tabular-nums;flex:none}
+.item.cero .cnt{color:var(--gris)}
+
+.pista{background:var(--crema);border:1px solid var(--linea);border-radius:10px;
+  padding:14px 16px;font-size:.86rem;color:var(--tinta);margin-bottom:16px}
+.pista b{font-weight:700}
+.cargando{color:var(--gris);font-size:.9rem;padding:20px 2px}
+.enlace-copiable{font-size:.78rem;color:var(--gris);word-break:break-all;
+  background:var(--crema);border-radius:7px;padding:10px 12px;margin:12px 0}
+#qr-nuevo{text-align:center;margin:14px 0 0;line-height:0}
+#qr-nuevo img,#qr-nuevo canvas{display:inline-block;width:150px;height:150px}
+.pie{margin-top:26px;font-size:.75rem;color:var(--gris);border-top:1px solid var(--linea);padding-top:13px}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="marca">POLKA<span>Bonos · barra</span></div>
+  <div class="usuario" id="usuario"></div>
+</header>
+
+<main id="app"><p class="cargando">Cargando…</p></main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+/* ================================================================= *
+ *  URL de la aplicación web de Apps Script (termina en /exec)
+ * ================================================================= */
+var API = 'https://script.google.com/macros/s/AKfycbz9Ly4vRbFrTndHOg9xatZB5K7-BRm2Sl5fdyaTNyiaA48KlqY-0gHJPEuyDv1oZrrrTg/exec';
+/* ================================================================= */
+
+(function () {
+  var PRECIO_MENU = 18.95;
+  var FORMULAS = {
+    '10+2': { pagadas: 10, cortesia: 2 },
+    '15+2': { pagadas: 15, cortesia: 2 },
+    '20+3': { pagadas: 20, cortesia: 3 },
+    '20+4': { pagadas: 20, cortesia: 4 }
+  };
+
+  var app = document.getElementById('app');
+  var cajaUsuario = document.getElementById('usuario');
+  var sesion = { pin: '', nombre: '' };
+
+  function guardaSesion() {
+    try {
+      localStorage.setItem('polka-bonos-pin', sesion.pin);
+      localStorage.setItem('polka-bonos-nombre', sesion.nombre);
+    } catch (e) {}
+  }
+  function cargaSesion() {
+    try {
+      sesion.pin = localStorage.getItem('polka-bonos-pin') || '';
+      sesion.nombre = localStorage.getItem('polka-bonos-nombre') || '';
+    } catch (e) {}
+  }
+  function salir() {
+    sesion = { pin: '', nombre: '' };
+    try { localStorage.removeItem('polka-bonos-pin'); localStorage.removeItem('polka-bonos-nombre'); } catch (e) {}
+    arranca();
+  }
+
+  function token() {
+    var m = location.search.match(/[?&]b=([A-Za-z0-9_-]+)/);
+    return m ? m[1] : '';
+  }
+  function urlCliente(t) {
+    return location.origin + location.pathname.replace(/[^\/]*$/, '') + 'index.html?b=' + t;
+  }
+
+  function jsonp(params, cb) {
+    var nombre = 'cbBarra' + Math.random().toString(36).slice(2);
+    var s = document.createElement('script');
+    var q = Object.keys(params).map(function (k) {
+      return encodeURIComponent(k) + '=' + encodeURIComponent(params[k]);
+    }).join('&');
+    var listo = false;
+    window[nombre] = function (d) { listo = true; limpia(); cb(d); };
+    function limpia() { try { delete window[nombre]; } catch (e) {} if (s.parentNode) s.parentNode.removeChild(s); }
+    s.onerror = function () { if (!listo) { limpia(); cb({ ok: false, error: 'Sin conexión con la hoja' }); } };
+    setTimeout(function () { if (!listo) { limpia(); cb({ ok: false, error: 'Sin conexión con la hoja' }); } }, 20000);
+    s.src = API + (API.indexOf('?') === -1 ? '?' : '&') + q + '&callback=' + nombre;
+    document.body.appendChild(s);
+  }
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function eur(n) { return Number(n).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €'; }
+  function fecha(iso) {
+    if (!iso) return '';
+    var d = new Date(iso.length === 10 ? iso + 'T12:00:00' : iso);
+    return isNaN(d) ? '' : d.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  }
+  function hoyISO() {
+    var d = new Date();
+    return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+  }
+  function diasHasta(f) {
+    if (!f) return null;
+    var d = new Date(f + 'T23:59:59');
+    return isNaN(d) ? null : Math.ceil((d - new Date()) / 86400000);
+  }
+
+  var TICK = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3.3L13 4.8" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+  function pintaCasillas(b) {
+    var out = '';
+    for (var i = 0; i < b.total; i++) {
+      var regalo = i >= b.pagadas;
+      var usada = i < b.usadas;
+      out += '<div class="cas' + (regalo ? ' regalo' : '') +
+             (regalo && i === b.pagadas ? ' primera-regalo' : '') +
+             (usada ? ' usada' : '') + '">' + (usada ? TICK : '') + '</div>';
+    }
+    return out;
+  }
+
+  function pintaCabecera() {
+    if (!sesion.nombre) { cajaUsuario.innerHTML = ''; return; }
+    cajaUsuario.innerHTML = 'Sirve<b>' + esc(sesion.nombre) + '</b>' +
+      '<button type="button" id="btn-salir">Cambiar</button>';
+    document.getElementById('btn-salir').addEventListener('click', salir);
+  }
+
+  function pantallaAcceso(mensaje) {
+    app.innerHTML =
+      '<div class="tarjeta">' +
+        '<h2>Acceso del equipo</h2>' +
+        '<p class="meta">Introduce tu código para poder descontar comidas.</p>' +
+        (mensaje ? '<div class="caja-error" style="margin-top:14px">' + esc(mensaje) + '</div>' : '') +
+        '<div class="campo" style="margin-top:16px"><label for="pin">Tu código</label>' +
+          '<input id="pin" type="tel" inputmode="numeric" autocomplete="off" maxlength="8" placeholder="••••"></div>' +
+        '<button class="btn grande" id="btn-entrar">Entrar</button>' +
+      '</div>' +
+      '<div class="pista"><b>Solo el equipo.</b> Este código queda guardado en este móvil, ' +
+        'así que no hay que teclearlo cada vez.</div>';
+
+    var input = document.getElementById('pin');
+    function entrar() {
+      var v = (input.value || '').trim();
+      if (!v) return input.focus();
+      var btn = document.getElementById('btn-entrar');
+      btn.disabled = true; btn.textContent = 'Comprobando…';
+      jsonp({ action: 'login', pin: v }, function (r) {
+        if (!r || !r.ok) return pantallaAcceso((r && r.error) || 'No se ha podido comprobar el código');
+        sesion.pin = v; sesion.nombre = r.nombre;
+        guardaSesion(); pintaCabecera(); arranca();
+      });
+    }
+    document.getElementById('btn-entrar').addEventListener('click', entrar);
+    input.addEventListener('keydown', function (e) { if (e.key === 'Enter') entrar(); });
+    input.focus();
+  }
+
+  function pantallaBono(t, extra) {
+    app.innerHTML = '<p class="cargando">Leyendo el bono…</p>';
+    jsonp({ action: 'bono', b: t }, function (r) {
+      if (!r || !r.ok) {
+        app.innerHTML = '<div class="caja-error">' + esc((r && r.error) || 'Bono no encontrado') + '</div>' +
+          '<button class="btn fantasma" id="ir-lista">Ver todos los bonos</button>';
+        document.getElementById('ir-lista').addEventListener('click', function () { irA(''); });
+        return;
+      }
+      var b = r.bono;
+      var d = diasHasta(b.caduca);
+      var agotado = b.restantes === 0;
+
+      var pills = '';
+      if (b.estado === 'anulado') pills += '<span class="pill alerta">Anulado</span>';
+      else if (agotado) pills += '<span class="pill neutro">Consumido</span>';
+      else if (d !== null && d < 0) pills += '<span class="pill alerta">Caducado el ' + fecha(b.caduca) + '</span>';
+      else if (d !== null && d <= 15) pills += '<span class="pill aviso">Caduca en ' + d + ' días</span>';
+      else if (b.caduca) pills += '<span class="pill ok">Hasta ' + fecha(b.caduca) + '</span>';
+
+      app.innerHTML =
+        (extra || '') +
+        '<div class="tarjeta">' +
+          '<div class="cabecera-bono">' +
+            '<div><h2>' + esc(b.nombre) + '</h2>' +
+            '<p class="meta">Bono ' + b.pagadas + '+' + b.cortesia + ' · ' + eur(b.importe) +
+            (b.compra ? ' · ' + fecha(b.compra) : '') + '</p></div>' +
+            '<div class="restantes"><span class="n">' + b.restantes + '</span><span class="u">restantes</span></div>' +
+          '</div>' +
+          '<div class="casillas">' + pintaCasillas(b) + '</div>' +
+          '<div class="leyenda">' + b.pagadas + ' pagadas · <b>' + b.cortesia + ' de cortesía</b></div>' +
+          (pills ? '<div class="etiquetas">' + pills + '</div>' : '') +
+          (b.nota ? '<p class="meta" style="margin-top:12px">' + esc(b.nota) + '</p>' : '') +
+        '</div>' +
+        (agotado || b.estado === 'anulado' ? '' :
+          '<button class="btn grande" id="btn-consumir">Descontar 1 comida</button>') +
+        '<div class="fila" style="margin-top:12px">' +
+          (b.usadas ? '<button class="btn fantasma pequeno" id="btn-deshacer">Deshacer última</button>' : '') +
+          '<button class="btn fantasma pequeno" id="btn-lista">Todos los bonos</button>' +
+        '</div>';
+
+      var bc = document.getElementById('btn-consumir');
+      if (bc) bc.addEventListener('click', function () { consumir(t, false); });
+      var bd = document.getElementById('btn-deshacer');
+      if (bd) bd.addEventListener('click', function () {
+        bd.disabled = true;
+        jsonp({ action: 'deshacer', b: t, pin: sesion.pin }, function (r2) {
+          if (!r2 || !r2.ok) return pantallaBono(t, '<div class="caja-error">' + esc((r2 && r2.error) || 'No se ha podido deshacer') + '</div>');
+          pantallaBono(t, '<div class="caja-ok"><h2>Comida devuelta al bono</h2></div>');
+        });
+      });
+      document.getElementById('btn-lista').addEventListener('click', function () { irA(''); });
+    });
+  }
+
+  function consumir(t, confirmar) {
+    var btn = document.getElementById('btn-consumir');
+    if (btn) { btn.disabled = true; btn.textContent = 'Descontando…'; }
+    var params = { action: 'consumir', b: t, pin: sesion.pin };
+    if (confirmar) params.confirm = '1';
+    jsonp(params, function (r) {
+      if (!r || !r.ok) {
+        if (r && r.aviso) {
+          pantallaBono(t,
+            '<div class="caja-aviso"><h2>Un momento</h2><p>' + esc(r.error) + '</p>' +
+            '<div class="fila"><button class="btn pequeno" id="btn-forzar">Sí, descontar</button>' +
+            '<button class="btn fantasma pequeno" id="btn-nada">Dejarlo</button></div></div>');
+          setTimeout(function () {
+            var f = document.getElementById('btn-forzar');
+            if (f) f.addEventListener('click', function () { consumir(t, true); });
+            var n = document.getElementById('btn-nada');
+            if (n) n.addEventListener('click', function () { pantallaBono(t); });
+          }, 0);
+          return;
+        }
+        return pantallaBono(t, '<div class="caja-error">' + esc((r && r.error) || 'No se ha podido descontar') + '</div>');
+      }
+      var txt = r.tipo === 'cortesia' ? 'Comida de cortesía descontada' : 'Comida descontada';
+      pantallaBono(t, '<div class="caja-ok"><h2>' + txt + '</h2>' +
+        '<p>' + esc(r.nombre) + ' · le quedan <b>' + r.restantes + '</b>' +
+        (r.restantes === 0 ? ' — bono terminado' : '') + '</p></div>');
+    });
+  }
+
+  function pantallaLista(extra) {
+    app.innerHTML = (extra || '') + '<p class="cargando">Cargando bonos…</p>';
+    jsonp({ action: 'lista', pin: sesion.pin }, function (r) {
+      if (!r || !r.ok) {
+        if (r && /código/i.test(r.error || '')) return pantallaAcceso('Tu código ya no es válido');
+        app.innerHTML = (extra || '') + '<div class="caja-error">' + esc((r && r.error) || 'No se ha podido cargar') + '</div>';
+        return;
+      }
+      var bonos = r.bonos || [];
+      var activos = 0, pendientes = 0;
+      bonos.forEach(function (b) { if (b.restantes > 0 && b.estado !== 'anulado') { activos++; pendientes += b.restantes; } });
+
+      var html = (extra || '') +
+        '<div class="pista"><b>Para descontar una comida</b>, apunta con la cámara del móvil al QR ' +
+        'del cliente. Se abrirá esta página con su bono ya cargado.</div>' +
+        '<button class="btn grande" id="btn-nuevo">+ Nuevo bono</button>' +
+        '<div class="seccion"><h2>' + activos + ' bonos activos · ' + pendientes + ' comidas pendientes</h2></div>';
+
+      if (!bonos.length) {
+        html += '<div class="tarjeta"><h2>Todavía no hay bonos</h2>' +
+                '<p class="meta">Crea el primero cuando un cliente pague por adelantado.</p></div>';
+      } else {
+        bonos.forEach(function (b) {
+          var cero = b.restantes === 0 || b.estado === 'anulado';
+          html += '<button class="item' + (cero ? ' cero' : '') + '" data-t="' + esc(b.token) + '">' +
+            '<span><span class="nom">' + esc(b.nombre) + '</span><br>' +
+            '<span class="sub">' + b.pagadas + '+' + b.cortesia +
+            (b.caduca ? ' · hasta ' + fecha(b.caduca) : '') +
+            (b.estado === 'anulado' ? ' · anulado' : (b.restantes === 0 ? ' · consumido' : '')) + '</span></span>' +
+            '<span class="cnt">' + b.restantes + '</span></button>';
+        });
+      }
+      html += '<p class="pie">Menú Polkero 18,95 € · L-V 12:30-16:00 · festivos no · ' +
+              'suplementos y 10 % de terraza fuera del bono.</p>';
+      app.innerHTML = html;
+
+      document.getElementById('btn-nuevo').addEventListener('click', pantallaNuevo);
+      Array.prototype.forEach.call(app.querySelectorAll('.item'), function (el) {
+        el.addEventListener('click', function () { irA(el.getAttribute('data-t')); });
+      });
+    });
+  }
+
+  function pantallaNuevo() {
+    app.innerHTML =
+      '<div class="tarjeta">' +
+        '<h2>Nuevo bono</h2>' +
+        '<div class="campo" style="margin-top:14px"><label for="n-nombre">Cliente</label>' +
+          '<input id="n-nombre" placeholder="Nombre y apellido" autocomplete="off"></div>' +
+        '<div class="campo"><label for="n-tel">Móvil (opcional)</label>' +
+          '<input id="n-tel" type="tel" inputmode="tel" placeholder="6XX XXX XXX" autocomplete="off"></div>' +
+        '<div class="campo"><label for="n-formula">Fórmula</label><select id="n-formula">' +
+          '<option value="10+2">10 + 2 de cortesía — 189,50 €</option>' +
+          '<option value="15+2">15 + 2 de cortesía — 284,25 €</option>' +
+          '<option value="20+3">20 + 3 de cortesía — 379,00 €</option>' +
+          '<option value="20+4">20 + 4 de cortesía — 379,00 €</option>' +
+          '<option value="custom">Personalizada…</option></select></div>' +
+        '<div class="dos" id="n-custom" style="display:none">' +
+          '<div class="campo"><label for="n-pagadas">Pagadas</label>' +
+            '<input id="n-pagadas" type="number" inputmode="numeric" min="1" max="60" value="10"></div>' +
+          '<div class="campo"><label for="n-cortesia">Cortesía</label>' +
+            '<input id="n-cortesia" type="number" inputmode="numeric" min="0" max="20" value="2"></div>' +
+        '</div>' +
+        '<div class="dos">' +
+          '<div class="campo"><label for="n-compra">Fecha</label>' +
+            '<input id="n-compra" type="date" value="' + hoyISO() + '"></div>' +
+          '<div class="campo"><label for="n-meses">Validez</label><select id="n-meses">' +
+            '<option value="1">1 mes</option><option value="2">2 meses</option>' +
+            '<option value="3" selected>3 meses</option><option value="6">6 meses</option>' +
+            '<option value="0">Sin caducidad</option></select></div>' +
+        '</div>' +
+        '<div class="campo"><label for="n-importe">Importe cobrado (€)</label>' +
+          '<input id="n-importe" type="number" step="0.05" min="0" inputmode="decimal" value="189.50"></div>' +
+        '<div class="campo"><label for="n-nota">Nota (opcional)</label>' +
+          '<input id="n-nota" placeholder="Ej.: recepción del hotel" autocomplete="off"></div>' +
+        '<div class="resumen-precio" id="n-resumen"></div>' +
+        '<div class="fila"><button class="btn" id="n-crear" style="flex:1">Crear bono</button>' +
+          '<button class="btn fantasma" id="n-cancelar">Cancelar</button></div>' +
+      '</div>';
+
+    var sel = document.getElementById('n-formula');
+    var custom = document.getElementById('n-custom');
+    var pag = document.getElementById('n-pagadas');
+    var cor = document.getElementById('n-cortesia');
+    var imp = document.getElementById('n-importe');
+    var res = document.getElementById('n-resumen');
+
+    function nums() {
+      if (sel.value === 'custom') {
+        return { p: Math.max(1, Number(pag.value) || 0), c: Math.max(0, Number(cor.value) || 0) };
+      }
+      var f = FORMULAS[sel.value];
+      return { p: f.pagadas, c: f.cortesia };
+    }
+    function refresca(auto) {
+      custom.style.display = sel.value === 'custom' ? 'grid' : 'none';
+      var n = nums();
+      if (auto) imp.value = (n.p * PRECIO_MENU).toFixed(2);
+      var total = n.p + n.c;
+      var unit = total ? (Number(imp.value) || 0) / total : 0;
+      var dto = (1 - unit / PRECIO_MENU) * 100;
+      res.innerHTML = '<span>' + total + ' comidas · <b>' + eur(unit) + '</b>/menú</span>' +
+                      '<span>Dto. <b>' + dto.toFixed(1).replace('.', ',') + ' %</b></span>' +
+                      '<span>Ahorra <b>' + eur(n.c * PRECIO_MENU) + '</b></span>';
+    }
+    sel.addEventListener('change', function () { refresca(true); });
+    pag.addEventListener('input', function () { refresca(true); });
+    cor.addEventListener('input', function () { refresca(false); });
+    imp.addEventListener('input', function () { refresca(false); });
+    refresca(true);
+
+    document.getElementById('n-cancelar').addEventListener('click', function () { irA(''); });
+    document.getElementById('n-crear').addEventListener('click', function () {
+      var nombre = document.getElementById('n-nombre').value.trim();
+      if (!nombre) return document.getElementById('n-nombre').focus();
+      var n = nums();
+      var btn = document.getElementById('n-crear');
+      btn.disabled = true; btn.textContent = 'Creando…';
+      jsonp({
+        action: 'crear', pin: sesion.pin, nombre: nombre,
+        telefono: document.getElementById('n-tel').value.trim(),
+        pagadas: n.p, cortesia: n.c,
+        importe: Number(imp.value) || n.p * PRECIO_MENU,
+        compra: document.getElementById('n-compra').value || hoyISO(),
+        meses: document.getElementById('n-meses').value,
+        nota: document.getElementById('n-nota').value.trim()
+      }, function (r) {
+        if (!r || !r.ok) {
+          btn.disabled = false; btn.textContent = 'Crear bono';
+          app.insertBefore(crearError((r && r.error) || 'No se ha podido crear'), app.firstChild);
+          return;
+        }
+        pantallaEntrega(r.token, nombre, document.getElementById('n-tel').value.trim(), n);
+      });
+    });
+  }
+
+  function crearError(msg) {
+    var d = document.createElement('div');
+    d.className = 'caja-error';
+    d.textContent = msg;
+    return d;
+  }
+
+  function pantallaEntrega(t, nombre, telefono, n) {
+    var url = urlCliente(t);
+    var texto = 'Kaixo ' + nombre + '! Aquí tienes tu bono de POLKA: ' + (n.p + n.c) +
+      ' comidas del Menú Polkero (' + n.p + ' pagadas y ' + n.c + ' de cortesía). ' +
+      'Guarda este enlace en la pantalla de inicio de tu móvil y enséñalo al pedir: ' + url;
+    var tel = (telefono || '').replace(/[^0-9]/g, '');
+    if (tel && tel.length === 9) tel = '34' + tel;
+    var wa = 'https://wa.me/' + (tel || '') + '?text=' + encodeURIComponent(texto);
+
+    app.innerHTML =
+      '<div class="caja-ok"><h2>Bono creado</h2><p>' + esc(nombre) + ' · ' + (n.p + n.c) + ' comidas</p></div>' +
+      '<div class="tarjeta">' +
+        '<h2>Mándaselo</h2>' +
+        '<p class="meta">Este es su enlace personal. Que lo guarde en la pantalla de inicio.</p>' +
+        '<div class="enlace-copiable" id="enlace">' + esc(url) + '</div>' +
+        '<div class="fila">' +
+          '<a class="btn" style="flex:1;text-align:center;text-decoration:none" href="' + esc(wa) + '" target="_blank" rel="noopener">Enviar por WhatsApp</a>' +
+          '<button class="btn fantasma" id="btn-copiar">Copiar</button>' +
+        '</div>' +
+        '<div id="qr-nuevo"></div>' +
+        '<p class="meta" style="text-align:center">También puedes enseñarle este QR para que lo abra.</p>' +
+      '</div>' +
+      '<button class="btn fantasma" id="btn-volver">Volver a la lista</button>';
+
+    document.getElementById('btn-copiar').addEventListener('click', function () {
+      var b = document.getElementById('btn-copiar');
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(url).then(function () {
+          b.textContent = 'Copiado'; setTimeout(function () { b.textContent = 'Copiar'; }, 2500);
+        }, function () { b.textContent = 'Copia a mano'; });
+      } else { b.textContent = 'Copia a mano'; }
+    });
+    document.getElementById('btn-volver').addEventListener('click', function () { irA(''); });
+
+    try {
+      new QRCode(document.getElementById('qr-nuevo'), {
+        text: url, width: 150, height: 150,
+        colorDark: '#14162B', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M
+      });
+    } catch (e) {}
+  }
+
+  function irA(t) {
+    var base = location.pathname;
+    var nueva = t ? base + '?b=' + t : base;
+    if (history.replaceState) history.replaceState(null, '', nueva);
+    arranca();
+  }
+
+  function arranca() {
+    pintaCabecera();
+    if (!sesion.pin) return pantallaAcceso();
+    var t = token();
+    if (t) return pantallaBono(t);
+    pantallaLista();
+  }
+
+  cargaSesion();
+  arranca();
+})();
+</script>
+</body>
+</html>
